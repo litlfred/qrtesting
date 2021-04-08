@@ -34,27 +34,31 @@ let b45str = base45.encode(encoded)
 console.log("Based 45 Encoded of CBOR: " + b45str)
 console.log("  Length: " + b45str.length)
 
+console.log("JSON String / Q")
 qrcode.toString(str, { errorCorrectionLevel: 'L' }, (err,string) => {
   console.log(string)
 } )
+console.log(qrcode.create(condStr, { errorCorrectionLevel: 'L' }))
 
+console.log("JSON String / Q")
 qrcode.toString(str, { errorCorrectionLevel: 'Q' }, (err,string) => {
   console.log(string)
 } )
+console.log(qrcode.create(condStr, { errorCorrectionLevel: 'Q' }))
 
-
+console.log("Condensed String / L")
 qrcode.toString(condStr, { errorCorrectionLevel: 'L' }, (err,string) => {
   console.log(string)
 } )
+console.log(qrcode.create(condStr, { errorCorrectionLevel: 'L' }))
 
+console.log("Condensed String / Q")
 qrcode.toString(condStr, { errorCorrectionLevel: 'Q' }, (err,string) => {
   console.log(string)
 } )
+console.log(qrcode.create(condStr, { errorCorrectionLevel: 'Q' }))
 
 
-let qr = qrcode.create(str, { errorCorrectionLevel: 'L' })
-const qrpretty = stringifyObject(qr, { indent: '  ',  singleQuotes: false })
-console.log( qr)
 
 
 qrcode.toFile( 'test45.png', [ { data: b45str } ], { errorCorrectionLevel: "Q" }, (err,out) => {
