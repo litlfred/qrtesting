@@ -39,31 +39,45 @@ qrcode.toString(str, { errorCorrectionLevel: 'L' }, (err,string) => {
   console.log(string)
 } )
 console.log(qrcode.create(condStr, { errorCorrectionLevel: 'L' }))
+qrcode.toFile('json_l.png', [ {data: str}], { errorCorrectionLevel: 'L' }, (err,out) => {})
 
 console.log("JSON String / Q")
 qrcode.toString(str, { errorCorrectionLevel: 'Q' }, (err,string) => {
   console.log(string)
 } )
 console.log(qrcode.create(condStr, { errorCorrectionLevel: 'Q' }))
+qrcode.toFile('json_q.png', [ {data: str}], { errorCorrectionLevel: 'Q' }, (err,out) => {})
 
 console.log("Condensed String / L")
 qrcode.toString(condStr, { errorCorrectionLevel: 'L' }, (err,string) => {
   console.log(string)
 } )
 console.log(qrcode.create(condStr, { errorCorrectionLevel: 'L' }))
+qrcode.toFile('cond_l.png', [ {data: condStr}], { errorCorrectionLevel: 'L' }, (err,out) => {})
 
 console.log("Condensed String / Q")
 qrcode.toString(condStr, { errorCorrectionLevel: 'Q' }, (err,string) => {
   console.log(string)
 } )
 console.log(qrcode.create(condStr, { errorCorrectionLevel: 'Q' }))
+qrcode.toFile('cond_q.png', [ {data: condStr}], { errorCorrectionLevel: 'Q' }, (err,out) => {})
+
+console.log("b45 String / L")
+qrcode.toString(b45str, { errorCorrectionLevel: 'L' }, (err,string) => {
+  console.log(string)
+} )
+console.log(qrcode.create(b45str, { errorCorrectionLevel: 'L' }))
+qrcode.toFile('test45_l.png', [ {data: b45str}], { errorCorrectionLevel: 'L' }, (err,out) => {})
+
+console.log("b45 String / Q")
+qrcode.toString(b45str, { errorCorrectionLevel: 'Q' }, (err,string) => {
+  console.log(string)
+} )
+console.log(qrcode.create(b45str, { errorCorrectionLevel: 'Q' }))
+qrcode.toFile('test45_q.png', [ {data: b45str}], { errorCorrectionLevel: 'Q' }, (err,out) => {})
 
 
 
-
-qrcode.toFile( 'test45.png', [ { data: b45str } ], { errorCorrectionLevel: "Q" }, (err,out) => {
-  console.log("DONE WITH FILE")
-})
 
 //let decoded = cbor.decode(encoded)
 //console.log(decoded)
