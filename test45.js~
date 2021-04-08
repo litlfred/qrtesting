@@ -1,0 +1,35 @@
+const cbor = require('cbor')
+const qrcode = require('qrcode')
+const base45 = require('base45')
+
+const CONTENT = {
+  "r": "svc-qr-uvci",
+  "i": "example",
+  "v": "RC-2-draft",
+  "n": "Felix Cat",
+  "b": "2005-10-04",
+  "d": "h1dZ75FMdY9EQQjE64O4",
+  "p": "bMlJkAt0V92RYhhG3fNt",
+  "s": "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+  "k": "12345678"
+}
+
+let encoded = cbor.encode(CONTENT)
+
+console.log(encoded.length)
+
+let b45str = base45.encode(encoded)
+console.log(b45str.length)
+
+qrcode.toString(JSON.stringify(CONTENT), { errorCorrectionLevel: 'Q' }, (err,string) => {
+  console.log(string)
+} )
+
+qrcode.toFile( 'test45.png', [ { data: b45str } ], { errorCorrectionLevel: "Q" }, (err,out) => {
+  console.log("DONE WITH FILE")
+})
+
+//let decoded = cbor.decode(encoded)
+//console.log(decoded)
+
+

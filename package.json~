@@ -1,0 +1,9 @@
+{
+    "dependencies": {
+        "base45": "^3.0.0",
+        "cbor": "^7.0.5",
+        "get-dependencies": "^1.1.0",
+        "jws": "^4.0.0",
+        "qrcode": "^1.4.4"
+    }
+}
