@@ -23,10 +23,10 @@ qrcode.toString(str_content, { errorCorrectionLevel: 'Q' }, (err,string) => {
   console.log(string)
 } )
 
-qrcode.toFile( 'testout.png', [ { data: encoded } ], { errorCorrectionLevel: 'Q' }, (err,out) => {
+qrcode.toFile('output/testout.png', [ { data: encoded } ], { errorCorrectionLevel: 'Q' }, (err,out) => {
   console.log("DONE WITH FILE")
 })
-qrcode.toFile( 'teststring.png', JSON.stringify(CONTENT), { errorCorrectionLevel: 'Q' }, (err,out) => {
+qrcode.toFile('output/teststring.png', JSON.stringify(CONTENT), { errorCorrectionLevel: 'Q' }, (err,out) => {
   console.log("DONE WITH FILE STRING")
 })
 

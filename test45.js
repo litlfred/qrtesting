@@ -3,94 +3,169 @@ const qrcode = require('qrcode')
 const base45 = require('base45')
 const jws = require('jws')
 const stringifyObject = require('stringify-object')
+const cose = require('cose-js');
+const fs = require('fs');
 
-const CONTENT = {
-  "r": "svc-qr-uvci",
-  "i": "example",
-  "v": "RC-2-draft",
-  "n": "Felix Cat",
-  "b": "2005-10-04",
-  "d": "h1dZ75FMdY9EQQjE64O4",
-  "p": "bMlJkAt0V92RYhhG3fNt",
-  "s": "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJVadQssw5c",
-  "k": "12345678"
+let ec_lvls = ['L','Q']
+let msgs = {
+    "paper_svc_demo_pid" : {
+	"r": "svc-qr-uvci",
+	"i": "MdY9EQQ75F64O4jEh1dZ",
+	"v": "RC-2-draft",
+	"n": "Felix Cat",
+	"b": "2005-10-04",
+	"c": "h1dZ75FMdY9EQQjE64O4",
+	"p": "bMlJkAt0V92RYhhG3fNt",
+	"a": "EXA1234244"
+    },
+    "paper_svc_no_demo_pid" : {
+	"r": "svc-qr-uvci",
+	"i": "MdY9EQQ75F64O4jEh1dZ",
+	"v": "RC-2-draft",
+	"d": "h1dZ75FMdY9EQQjE64O4",
+	"p": "bMlJkAt0V92RYhhG3fNt",
+	"a": "EXA1234244"
+    },
+    "paper_svc_no_demo_no_pid" : {
+	"r": "svc-qr-uvci",
+	"i": "MdY9EQQ75F64O4jEh1dZ",
+	"v": "RC-2-draft",
+	"d": "h1dZ75FMdY9EQQjE64O4",
+	"a": "EXA1234244"
+    },
+    "paper_svc_demo_no_pid" : {
+	"r": "svc-qr-uvci",
+	"i": "MdY9EQQ75F64O4jEh1dZ",
+	"v": "RC-2-draft",
+	"n": "Felix Cat",
+	"b": "2005-10-04",
+	"d": "h1dZ75FMdY9EQQjE64O4",
+	"p": "bMlJkAt0V92RYhhG3fNt",
+	"a": "EXA1234244"
+    },
+
+    "immunization_event_no_demo_pid" :  {
+	"r": "svc-qr-uvcei",
+	"e": "2006-10-04",
+	"l": "AXK23RWERS",
+	"o": "2021-05-22",
+	"d": "h1dZ75FMdY9EQQjE64O4",
+        "p": "bMlJkAt0V92RYhhG3fNt",
+	"a": "EXA1234244",
+	"v": "RA01.1",
+	"s": "completed",
+	"c": "MDRNA1",
+	"v": "RC-2-draft",
+    },
+    
+    "immunization_event_demo_pid" :  {
+	"r": "svc-qr-uvcei",
+	"e": "2006-10-04",
+	"l": "AXK23RWERS",
+	"n": "Felix Cat",
+	"b": "2005-10-04",
+	"o": "2021-05-22",
+	"d": "h1dZ75FMdY9EQQjE64O4",
+        "p": "bMlJkAt0V92RYhhG3fNt",
+	"a": "EXA1234244",
+	"v": "RA01.1",
+	"s": "completed",
+	"c": "MDRNA1",
+	"v": "RC-2-draft",
+    },
+    "immunization_event_demo_no_pid" :  {
+	"r": "svc-qr-uvcei",
+	"e": "2006-10-04",
+	"l": "AXK23RWERS",
+	"n": "Felix Cat",
+	"b": "2005-10-04",
+	"o": "2021-05-22",
+	"d": "h1dZ75FMdY9EQQjE64O4",
+	"a": "EXA1234244",
+	"v": "RA01.1",
+	"s": "completed",
+	"c": "MDRNA1",
+	"v": "RC-2-draft",
+    }
+
+
 }
 
-let str = JSON.stringify(CONTENT)
-console.log("Looking at JSON string: " + str)
-console.log("  Length: " + str.length)
+
+/**********************************************************************
+ *  No need to edit below                                             *
+ *********************************************************************/
+
+fs.truncate('output/stats.csv', 0,function() {})
+fs.appendFile('output/stats.csv',"Message	Serialization	EC Level	Verion	Mod. Size	Length	Serialization\n",function() {})
+
+Object.keys(msgs).forEach( msgname=>{
+    let msg = msgs[msgname]
+    let sig_msg = msg
+    sig_msg['z'] = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJVadQssw5c"
+
+    console.log("\n\n\n******   Message "  + msgname + "   *********\n\n\n")
+    
+    let str = JSON.stringify(sig_msg)
+
+    let condStr = str.replaceAll('"','').replaceAll('{','').replaceAll('}','')
+    console.log("Looking at Signed Condesnsed string: " + condStr)
+    console.log("  Length: " + condStr.length)
 
 
+    let cbrstr = cbor.encode(msg)
+    console.log("CBOR encodded string: " + cbrstr)
+    console.log("  Length: " + cbrstr.length)
 
-console.log ("\n\n\JSON String Encodings")
-
-console.log("JSON String / L")
-qrcode.toString(str, { errorCorrectionLevel: 'L' }, (err,string) => {
-  console.log(string)
-} )
-console.log(qrcode.create(str, { errorCorrectionLevel: 'L' }))
-qrcode.toFile('json_l.png', [ {data: str}], { errorCorrectionLevel: 'L' }, (err,out) => {})
-
-console.log("JSON String / Q")
-qrcode.toString(str, { errorCorrectionLevel: 'Q' }, (err,string) => {
-  console.log(string)
-} )
-console.log(qrcode.create(str, { errorCorrectionLevel: 'Q' }))
-qrcode.toFile('json_q.png', [ {data: str}], { errorCorrectionLevel: 'Q' }, (err,out) => {})
+    let b45str = base45.encode(cbrstr)
+    console.log("Based 45 encoding of CBOR: " + b45str)
+    console.log("  Length: " + b45str.length)
 
 
-console.log ("\n\n\Condensend String Encodings")
-let condStr = str.replaceAll('"','').replaceAll('{','').replaceAll('}','')
-console.log("Condesnsed string: " + condStr)
-console.log("  Length: " + condStr.length)
+    const headers = {
+	'p': {'alg': 'ES256'},
+	'u': {'kid': '11'}
+    };
+    const signer = {
+	'key': {
+	    'd': Buffer.from('6c1382765aec5358f117733d281c1c7bdc39884d04a45a1e6c67c858bc206c19', 'hex')
+	}
+    };
 
-console.log("Condensed String / L")
-qrcode.toString(condStr, { errorCorrectionLevel: 'L' }, (err,string) => {
-  console.log(string)
-} )
-console.log(qrcode.create(condStr, { errorCorrectionLevel: 'L' }))
-qrcode.toFile('cond_l.png', [ {data: condStr}], { errorCorrectionLevel: 'L' }, (err,out) => {})
-
-console.log("Condensed String / Q")
-qrcode.toString(condStr, { errorCorrectionLevel: 'Q' }, (err,string) => {
-  console.log(string)
-} )
-console.log(qrcode.create(condStr, { errorCorrectionLevel: 'Q' }))
-qrcode.toFile('cond_q.png', [ {data: condStr}], { errorCorrectionLevel: 'Q' }, (err,out) => {})
-
-console.log ("\n\n\nBase 45 Encodings")
+    let cosebuf = cose.sign.create(headers,str,signer)
+    let cosestr =  cosebuf.toString('hex')
 
 
-let encoded = cbor.encode(CONTENT)
+    let serializations = {
+	'json' : str,
+	'condensed' : condStr,
+	'cbor_b45' : b45str
+//	'cose' : cosestr
+    }
 
-console.log("CBOR encodded string: " + encoded)
-console.log("  Length: " + encoded.length)
-
-let b45str = base45.encode(encoded)
-
-console.log("Based 45 Encoded of CBOR: " + b45str)
-console.log("  Length: " + b45str.length)
-
-
-
-console.log("b45 String / L")
-qrcode.toString(b45str, { errorCorrectionLevel: 'L' }, (err,string) => {
-  console.log(string)
-} )
-console.log(qrcode.create(b45str, { errorCorrectionLevel: 'L' }))
-qrcode.toFile('test45_l.png', [ {data: b45str}], { errorCorrectionLevel: 'L' }, (err,out) => {})
-
-console.log("b45 String / Q")
-qrcode.toString(b45str, { errorCorrectionLevel: 'Q' }, (err,string) => {
-  console.log(string)
-} )
-console.log(qrcode.create(b45str, { errorCorrectionLevel: 'Q' }))
-qrcode.toFile('test45_q.png', [ {data: b45str}], { errorCorrectionLevel: 'Q' }, (err,out) => {})
-
-
-
-
-//let decoded = cbor.decode(encoded)
-//console.log(decoded)
-
-
+    
+    ec_lvls.forEach( function(ec_lvl) {
+	Object.keys(serializations).forEach(sname => {
+	    let serialization = serializations[sname]
+	    console.log(sname + " / " +  ec_lvl)
+	    console.log("  Length: " + serialization.length)
+	    console.log("  Content: " + serialization)
+	    
+	    qrcode.toString(serialization, { errorCorrectionLevel: ec_lvl }, (err,string) => {
+		console.log(string)
+	    })
+	    let qr = qrcode.create(serialization, { errorCorrectionLevel: ec_lvl })
+	    console.log(qr)
+	    fs.appendFile('output/stats.csv',
+			  msgname + '	' +
+			  sname + '	' +
+			  ec_lvl + '	' +
+			  qr["version"] + "	" +
+			  qr["modules"]["size"] + "	" +
+			  serialization.length + '	'  +
+			  serialization  + "\n",
+			  function(){})
+	    qrcode.toFile('output/' + msgname + '.'  + sname +'.' + ec_lvl  +'.png', [ {data: serialization}], { errorCorrectionLevel: ec_lvl }, (err,out) => {})	
+	})
+    })
+})  
