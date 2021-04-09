@@ -3,8 +3,9 @@ const qrcode = require('qrcode')
 const base45 = require('base45')
 const jws = require('jws')
 const stringifyObject = require('stringify-object')
-const cose = require('cose-js');
-const fs = require('fs');
+const cose = require('cose-js')
+const fs = require('fs')
+const jwt = require('jsonwebtoken')
 
 let ec_lvls = ['L','Q']
 let msgs = {
@@ -113,6 +114,11 @@ Object.keys(msgs).forEach( msgname=>{
     console.log("  Length: " + condStr.length)
 
 
+    let jwtstr= jwt.sign(str, 'sooper_secret_key' , { algorithm:'HS256'})
+    console.log("Looking at JWT: " + jwtstr)
+    console.log("  Length: " + jwtstr.length)
+
+    
     let cbrstr = cbor.encode(msg)
     console.log("CBOR encodded string: " + cbrstr)
     console.log("  Length: " + cbrstr.length)
@@ -139,7 +145,8 @@ Object.keys(msgs).forEach( msgname=>{
     let serializations = {
 	'json' : str,
 	'condensed' : condStr,
-	'cbor_b45' : b45str
+	'cbor_b45' : b45str,
+	'jwt' : jwtstr
 //	'cose' : cosestr
     }
 
