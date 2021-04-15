@@ -3,6 +3,16 @@ const fs = require('fs')
 const cbor = require('cbor')
 const base32 = require('base32')
 const qrcode = require('qrcode')
+/*
+ * for ES256 create keys like this:
+ * ssh-keygen -t ecdsa -b 256 -m PEM -f ./ecdsa256.pem
+ * ssh-keygen -e -m PKCS8 -f ./ecdsa256.pem.pub > ecdsa256.pub
+ *
+ * for ES512 create keys like this:
+ * ssh-keygen -t ecdsa -b 521 -m PEM -f ./ecdsa521.pem
+ * ssh-keygen -e -m PKCS8 -f ./ecdsa521.pem.pub > ecdsa521.pub
+ */
+const ALGO = 'ES256'
 
 const DATA = { n: 'Felix Cat',
   b: '1980-01-01',
@@ -27,12 +37,17 @@ let payload = cbor.encode(DATA)
 console.log("PAYLOAD IS",payload)
 
 let signature = jws.sign( {
-  header: { alg: 'HS256' },
+  header: { alg: ALGO },
   payload: payload,
   privateKey: privKey
 } )
 
+let pubKey = fs.readFileSync( process.argv[3] )
 console.log(signature.length,signature)
+
+console.log( jws.verify( signature, ALGO, pubKey.toString() ) )
+console.log(jws.decode(signature))
+
 console.log(qrcode.create(signature, { errorCorrectionLevel: 'L' }))
 console.log(qrcode.create(signature, { errorCorrectionLevel: 'Q' }))
 
