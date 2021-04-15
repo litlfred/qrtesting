@@ -128,6 +128,10 @@ Object.keys(msgs).forEach( async (msgname) => {
     console.log("Based 45 encoding of CBOR: " + b45str)
     console.log("  Length: " + b45str.length)
 
+    let b32str = base32.encode(cbrstr).toUpperCase()
+    console.log("Based 32 encoding of CBOR: " + b32str)
+    console.log("  Length: " + b32str.length)
+
     let jwsstr = jws.sign( { 
       header: { alg: 'ES256' },
       payload: msg,
@@ -165,15 +169,18 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
     let cosestr =  cosebuf.toString('hex')
     // MUST DO toUpperCase() so QR will use alphanumeric
     let cose32 = base32.encode(cosebuf).toUpperCase()
+    let cose45 = base45.encode(cosebuf)
 
 
     let serializations = {
 	'json' : str,
 	'condensed' : condStr,
 	'cbor_b45' : b45str,
+	'cbor_b32' : b32str,
 	'jwt' : jwtstr,
 	'cose' : cosestr,
 	'cose32' : cose32,
+	'cose45' : cose45,
   'jws' : jwsstr,
   //'jwscbr' : jwscbr
     }
