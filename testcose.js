@@ -46,12 +46,16 @@ const verifier = {
 }
 
 cose.sign.create(headers, JSON.stringify(DATA), signer).then ( (buf) => {
-  console.log(buf)
   console.log(buf.toString('hex'))
   let buf_32 = base32.encode(buf).toUpperCase()
+  console.log(qrcode.create(buf.toString('hex'), { errorCorrectionLevel: 'Q' }))
   console.log(qrcode.create(buf_32, { errorCorrectionLevel: 'Q' }))
 
-  cose.sign.verify( buf, verifier ).then( (ver) => {
+  console.log(buf)
+  let rebuf = Buffer.from(base32.decode( buf_32 ), 'binary')
+  console.log(rebuf)
+
+  cose.sign.verify( rebuf, verifier ).then( (ver) => {
     console.log("VERIFIED", ver.toString('utf8'))
   } )
 

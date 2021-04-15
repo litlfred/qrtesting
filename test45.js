@@ -1,6 +1,7 @@
 const cbor = require('cbor')
 const qrcode = require('qrcode')
 const base45 = require('base45')
+const base32 = require('base32')
 const jws = require('jws')
 const stringifyObject = require('stringify-object')
 const cose = require('cose-js')
@@ -137,6 +138,7 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 -----END EC PRIVATE KEY-----`
     } )
 
+      /* makes invalid JWS due to payload and haven't found a way to retrieve from the payload yet
     let jwscbr = jws.sign( { 
       header: { alg: 'ES256' },
       payload: cbrstr,
@@ -146,6 +148,7 @@ AwEHoUQDQgAE8HOwR7KpuzBJn+H2Go2Qk9EmsK20+wzylQ64IKhrrszOrmIekG1v
 IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 -----END EC PRIVATE KEY-----`
     } )
+    */
 
 
     const headers = {
@@ -160,6 +163,7 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 
     let cosebuf = await cose.sign.create(headers,JSON.stringify(msg),signer)
     let cosestr =  cosebuf.toString('hex')
+    let cose32 = base32.encode(cosebuf).toUpperCase()
 
 
     let serializations = {
@@ -168,8 +172,9 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 	'cbor_b45' : b45str,
 	'jwt' : jwtstr,
 	'cose' : cosestr,
+	'cose32' : cose32,
   'jws' : jwsstr,
-  'jwscbr' : jwscbr
+  //'jwscbr' : jwscbr
     }
 
     

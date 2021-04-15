@@ -36,10 +36,14 @@ AwEHoUQDQgAE8HOwR7KpuzBJn+H2Go2Qk9EmsK20+wzylQ64IKhrrszOrmIekG1v
 IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 -----END EC PRIVATE KEY-----`
 
-let payload = cbor.encode(DATA)
+//let encoded = cbor.encode(DATA)
+//let payload = encoded.toString('hex')
+//let payload = { c: encoded }
+let payload = DATA
 
 console.log("JSON SIZE:",JSON.stringify(DATA).length)
-console.log("PAYLOAD IS",payload.length,payload)
+//console.log("CBOR SIZE:",encoded.length)
+console.log("PAYLOAD IS",payload.length)
 
 let signature = jws.sign( {
   header: { alg: ALGO },
@@ -47,10 +51,13 @@ let signature = jws.sign( {
   privateKey: privKey
 } )
 
-//let pubKey = fs.readFileSync( process.argv[3] )
 console.log(signature.length,signature)
 
-//console.log( jws.verify( signature, ALGO, pubKey.toString() ) )
+let pubKey = `-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8HOwR7KpuzBJn+H2Go2Qk9EmsK20
++wzylQ64IKhrrszOrmIekG1vIwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
+-----END PUBLIC KEY-----`
+console.log( jws.verify( signature, ALGO, pubKey.toString() ) )
 
 console.log("JWS L")
 console.log(qrcode.create(signature, { errorCorrectionLevel: 'L' }))
@@ -68,6 +75,8 @@ console.log(qrcode.create(sig_32, { errorCorrectionLevel: 'Q' }))
 
 let decoded = jws.decode(signature)
 console.log(decoded)
+//console.log(cbor.decode(Buffer.from(decoded.payload,'hex')))
+
 console.log(JSON.stringify(decoded).length)
 let cbor_decoded = base32.encode(cbor.encode(decoded)).toUpperCase()
 console.log(cbor_decoded.length, cbor_decoded)
