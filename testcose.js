@@ -45,7 +45,7 @@ const verifier = {
   }
 }
 
-cose.sign.create(headers, DATA, signer).then ( (buf) => {
+cose.sign.create(headers, JSON.stringify(DATA), signer).then ( (buf) => {
   console.log(buf)
   console.log(buf.toString('hex'))
   let buf_32 = base32.encode(buf).toUpperCase()
