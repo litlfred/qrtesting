@@ -137,6 +137,16 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 -----END EC PRIVATE KEY-----`
     } )
 
+    let jwscbr = jws.sign( { 
+      header: { alg: 'ES256' },
+      payload: cbrstr,
+      privateKey: `-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIM361ggcmEAJf6b7TxCW/Si5Nvr6ZDLrdpAfUvTRZSoloAoGCCqGSM49
+AwEHoUQDQgAE8HOwR7KpuzBJn+H2Go2Qk9EmsK20+wzylQ64IKhrrszOrmIekG1v
+IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
+-----END EC PRIVATE KEY-----`
+    } )
+
 
     const headers = {
 	'p': {'alg': 'ES256'},
@@ -148,7 +158,7 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 	}
     };
 
-    let cosebuf = await cose.sign.create(headers,str,signer)
+    let cosebuf = await cose.sign.create(headers,JSON.stringify(msg),signer)
     let cosestr =  cosebuf.toString('hex')
 
 
@@ -158,7 +168,8 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 	'cbor_b45' : b45str,
 	'jwt' : jwtstr,
 	'cose' : cosestr,
-  'jws' : jwsstr
+  'jws' : jwsstr,
+  'jwscbr' : jwscbr
     }
 
     
