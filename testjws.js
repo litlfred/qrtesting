@@ -30,11 +30,16 @@ const DATA = { n: 'Felix Cat',
 
 console.log(process.argv[2])
 
-let privKey = fs.readFileSync( process.argv[2] )
+let privKey = `-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIM361ggcmEAJf6b7TxCW/Si5Nvr6ZDLrdpAfUvTRZSoloAoGCCqGSM49
+AwEHoUQDQgAE8HOwR7KpuzBJn+H2Go2Qk9EmsK20+wzylQ64IKhrrszOrmIekG1v
+IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
+-----END EC PRIVATE KEY-----`
 
 let payload = cbor.encode(DATA)
 
-console.log("PAYLOAD IS",payload)
+console.log("JSON SIZE:",JSON.stringify(DATA).length)
+console.log("PAYLOAD IS",payload.length,payload)
 
 let signature = jws.sign( {
   header: { alg: ALGO },
@@ -42,17 +47,32 @@ let signature = jws.sign( {
   privateKey: privKey
 } )
 
-let pubKey = fs.readFileSync( process.argv[3] )
+//let pubKey = fs.readFileSync( process.argv[3] )
 console.log(signature.length,signature)
 
-console.log( jws.verify( signature, ALGO, pubKey.toString() ) )
-console.log(jws.decode(signature))
+//console.log( jws.verify( signature, ALGO, pubKey.toString() ) )
 
+console.log("JWS L")
 console.log(qrcode.create(signature, { errorCorrectionLevel: 'L' }))
+console.log("JWS Q")
 console.log(qrcode.create(signature, { errorCorrectionLevel: 'Q' }))
 
 let sig_32 = base32.encode(signature).toUpperCase()
 
 console.log(sig_32.length,sig_32)
+console.log("JWS 32 L")
 console.log(qrcode.create(sig_32, { errorCorrectionLevel: 'L' }))
+console.log("JWS 32 Q")
 console.log(qrcode.create(sig_32, { errorCorrectionLevel: 'Q' }))
+
+
+let decoded = jws.decode(signature)
+console.log(decoded)
+console.log(JSON.stringify(decoded).length)
+let cbor_decoded = base32.encode(cbor.encode(decoded)).toUpperCase()
+console.log(cbor_decoded.length, cbor_decoded)
+
+console.log("JWS CBOR L")
+console.log(qrcode.create(cbor_decoded, { errorCorrectionLevel: 'L' }))
+console.log("JWS CBOR Q")
+console.log(qrcode.create(cbor_decoded, { errorCorrectionLevel: 'Q' }))

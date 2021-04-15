@@ -100,7 +100,7 @@ let msgs = {
 fs.truncate('output/stats.csv', 0,function() {})
 fs.appendFile('output/stats.csv',"Message	Serialization	EC Level	Verion	Mod. Size	Length	Serialization\n",function() {})
 
-Object.keys(msgs).forEach( msgname=>{
+Object.keys(msgs).forEach( async (msgname) => {
     let msg = msgs[msgname]
     let sig_msg = msg
     sig_msg['z'] = "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJVadQssw5c"
@@ -109,7 +109,7 @@ Object.keys(msgs).forEach( msgname=>{
     
     let str = JSON.stringify(sig_msg)
 
-    let condStr = str.replaceAll('"','').replaceAll('{','').replaceAll('}','')
+    let condStr = str.replace(/["{}]/g,'')
     console.log("Looking at Signed Condesnsed string: " + condStr)
     console.log("  Length: " + condStr.length)
 
@@ -127,6 +127,16 @@ Object.keys(msgs).forEach( msgname=>{
     console.log("Based 45 encoding of CBOR: " + b45str)
     console.log("  Length: " + b45str.length)
 
+    let jwsstr = jws.sign( { 
+      header: { alg: 'ES256' },
+      payload: msg,
+      privateKey: `-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIM361ggcmEAJf6b7TxCW/Si5Nvr6ZDLrdpAfUvTRZSoloAoGCCqGSM49
+AwEHoUQDQgAE8HOwR7KpuzBJn+H2Go2Qk9EmsK20+wzylQ64IKhrrszOrmIekG1v
+IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
+-----END EC PRIVATE KEY-----`
+    } )
+
 
     const headers = {
 	'p': {'alg': 'ES256'},
@@ -138,7 +148,7 @@ Object.keys(msgs).forEach( msgname=>{
 	}
     };
 
-    let cosebuf = cose.sign.create(headers,str,signer)
+    let cosebuf = await cose.sign.create(headers,str,signer)
     let cosestr =  cosebuf.toString('hex')
 
 
@@ -146,33 +156,34 @@ Object.keys(msgs).forEach( msgname=>{
 	'json' : str,
 	'condensed' : condStr,
 	'cbor_b45' : b45str,
-	'jwt' : jwtstr
-//	'cose' : cosestr
+	'jwt' : jwtstr,
+	'cose' : cosestr,
+  'jws' : jwsstr
     }
 
     
-    ec_lvls.forEach( function(ec_lvl) {
-	Object.keys(serializations).forEach(sname => {
-	    let serialization = serializations[sname]
-	    console.log(sname + " / " +  ec_lvl)
-	    console.log("  Length: " + serialization.length)
-	    console.log("  Content: " + serialization)
-	    
-	    qrcode.toString(serialization, { errorCorrectionLevel: ec_lvl }, (err,string) => {
-		console.log(string)
-	    })
-	    let qr = qrcode.create(serialization, { errorCorrectionLevel: ec_lvl })
-	    console.log(qr)
-	    fs.appendFile('output/stats.csv',
-			  msgname + '	' +
-			  sname + '	' +
-			  ec_lvl + '	' +
-			  qr["version"] + "	" +
-			  qr["modules"]["size"] + "	" +
-			  serialization.length + '	'  +
-			  serialization  + "\n",
-			  function(){})
-	    qrcode.toFile('output/' + msgname + '.'  + sname +'.' + ec_lvl  +'.png', [ {data: serialization}], { errorCorrectionLevel: ec_lvl }, (err,out) => {})	
-	})
-    })
+      for ( let ec_lvl of ec_lvls ) {
+        for( let sname of Object.keys(serializations) ) {
+          let serialization = serializations[sname]
+          console.log(sname + " / " +  ec_lvl)
+          console.log("  Length: " + serialization.length)
+          console.log("  Content: " + serialization)
+
+          qrcode.toString(serialization, { errorCorrectionLevel: ec_lvl }, (err,string) => {
+            console.log(string)
+          })
+          let qr = qrcode.create(serialization, { errorCorrectionLevel: ec_lvl })
+          console.log(qr)
+          fs.appendFile('output/stats.csv',
+            msgname + '	' +
+            sname + '	' +
+            ec_lvl + '	' +
+            qr["version"] + "	" +
+            qr["modules"]["size"] + "	" +
+            serialization.length + '	'  +
+            serialization  + "\n",
+            function(){})
+          qrcode.toFile('output/' + msgname + '.'  + sname +'.' + ec_lvl  +'.png', [ {data: serialization}], { errorCorrectionLevel: ec_lvl }, (err,out) => {})	
+        }
+      }
 })  
