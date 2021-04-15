@@ -163,6 +163,7 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 
     let cosebuf = await cose.sign.create(headers,JSON.stringify(msg),signer)
     let cosestr =  cosebuf.toString('hex')
+    // MUST DO toUpperCase() so QR will use alphanumeric
     let cose32 = base32.encode(cosebuf).toUpperCase()
 
 
