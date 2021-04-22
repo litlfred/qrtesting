@@ -7,6 +7,7 @@ const stringifyObject = require('stringify-object')
 const cose = require('cose-js')
 const fs = require('fs')
 const jwt = require('jsonwebtoken')
+const zlib = require('zlib')
 
 let ec_lvls = ['L','Q']
 let msgs = {
@@ -88,8 +89,67 @@ let msgs = {
 	"s": "completed",
 	"c": "MDRNA1",
 	"v": "RC-2-draft",
+    },
+  "dgc" : {
+    "nam" : {
+      "_fn": "Cat",
+      "_gn": "Felix",
+    },
+    "dob" : "2005-10-04",
+    "dsc" : "4R8cUFReUiDHA2eP",
+    "v" : {
+      "tg": {
+        "code": "840539006",
+        "system": "2.16.840.1.113883.6.96"
+      },
+      "vp": {
+        "code": "1119305005"
+      },
+      "mp": {
+        "code": "EU/1/20/1507"
+      },
+      "ma": {
+        "code": "ORG-100031184"
+      },
+      "dn": 1,
+      "sd": 2,
+      "dt": "2021-04-01",
+      "co": "US",
+      "is": "Dept of Health",
+      "ci": "mSG6Te8PoUaNRsUetCzt2u"
     }
-
+  },
+  "dgc_longer" : {
+    "nam" : {
+      "fn": "世界偉人財神總統",
+      "_fn": "Shi Jie Wei Ren Cai Shen Zong Tong",
+      "gn": "黃宏成台灣阿成",
+      "_gn": "Huang Hong Cheng Tai Wan A Cheng"
+    },
+    "dob" : "2005-10-04",
+    "dsc" : "4R8cUFReUiDHA2eP",
+    "v" : {
+      "tg": {
+        "code": "840539006",
+        "system": "2.16.840.1.113883.6.96"
+      },
+      "vp": {
+        "code": "1119305005"
+      },
+      "mp": {
+        "code": "EU/1/20/1507"
+      },
+      "ma": {
+        "code": "ORG-100031184"
+      },
+      "dn": 1,
+      "sd": 2,
+      "dt": "2021-04-01",
+      "co": "US",
+      "is": "Dept of Health",
+      "ci": "mSG6Te8PoUaNRsUetCzt2u"
+    }
+}
 
 }
 
@@ -168,19 +228,34 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
     let cosebuf = await cose.sign.create(headers,JSON.stringify(msg),signer)
     let cosestr =  cosebuf.toString('hex')
     // MUST DO toUpperCase() so QR will use alphanumeric
+    let cosed = zlib.deflateSync(cosebuf)
+    let cosegz = zlib.gzipSync(cosebuf)
+    let cosebrotli = zlib.brotliCompressSync(cosebuf)
     let cose32 = base32.encode(cosebuf).toUpperCase()
     let cose45 = base45.encode(cosebuf)
+    let cosed32 = base32.encode(cosed)
+    let cosed45 = base45.encode(cosed)
+    let cosegz32 = base32.encode(cosegz)
+    let cosegz45 = base45.encode(cosegz)
+    let cosebrotli32 = base32.encode(cosebrotli)
+    let cosebrotli45 = base45.encode(cosebrotli)
 
 
     let serializations = {
-	'json' : str,
-	'condensed' : condStr,
-	'cbor_b45' : b45str,
-	'cbor_b32' : b32str,
-	'jwt' : jwtstr,
+	//'json' : str,
+	//'condensed' : condStr,
+	//'cbor_b45' : b45str,
+	//'cbor_b32' : b32str,
+	//'jwt' : jwtstr,
 	'cose' : cosestr,
-	'cose32' : cose32,
+	//'cose32' : cose32,
 	'cose45' : cose45,
+  //'cosed32' : cosed32,
+  'cosed45' : cosed45,
+  //'cosegz32' : cosegz32,
+  'cosegz45' : cosegz45,
+  //'cosebrotli32' : cosebrotli32,
+  'cosebrotli45' : cosebrotli45,
   'jws' : jwsstr,
   //'jwscbr' : jwscbr
     }
