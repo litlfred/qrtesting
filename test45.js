@@ -9,6 +9,18 @@ const fs = require('fs')
 const jwt = require('jsonwebtoken')
 const zlib = require('zlib')
 
+const jws_base64_2_45 = (str) => {
+  let parts = str.split('.')
+
+  let newparts = parts.map( part => {
+    let buff = new Buffer(part, 'base64')
+    let b45 = base45.encode(buff)
+    return b45
+  } )
+  return newparts.join('.')
+}
+
+
 let ec_lvls = ['L','Q']
 let msgs = {
     "paper_svc_demo_pid" : {
@@ -419,6 +431,27 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
     } )
     let jwsd = zlib.deflateSync(jwsstr)
     let jwsd45 = base45.encode(jwsd)
+    let jws45 = jws_base64_2_45(jwsstr)
+    let jws45d = zlib.deflateSync(jws45)
+    let jws45d45 = base45.encode(jws45d)
+
+    let jwscborstr = jws.sign( { 
+      header: { alg: 'ES256' },
+      payload: cbor.encode(msg),
+      privateKey: `-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIM361ggcmEAJf6b7TxCW/Si5Nvr6ZDLrdpAfUvTRZSoloAoGCCqGSM49
+AwEHoUQDQgAE8HOwR7KpuzBJn+H2Go2Qk9EmsK20+wzylQ64IKhrrszOrmIekG1v
+IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
+-----END EC PRIVATE KEY-----`
+    } )
+    let jwscbord = zlib.deflateSync(jwscborstr)
+    let jwscbord45 = base45.encode(jwscbord)
+
+    let jwscbor45 = jws_base64_2_45(jwscborstr)
+    let jwscbor45d = zlib.deflateSync(jwscbor45)
+    let jwscbor45d45 = base45.encode(jwscbor45d)
+
+
 
       /* makes invalid JWS due to payload and haven't found a way to retrieve from the payload yet
     let jwscbr = jws.sign( { 
@@ -495,7 +528,13 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
   //'cosebrotli32' : cosebrotli32,
   'cosebrotli45' : cosebrotli45,
   'jws' : jwsstr,
+  'jws45' : jws45,
   'jwsd45' : jwsd45,
+  //'jws45d45' : jws45d45,
+  'jwscbor' : jwscborstr,
+  'jwscbor45' : jwscbor45,
+  'jwscbord45' : jwscbord45,
+  //'jwscbor45d45' : jwscbor45d45,
   //'jwscbr' : jwscbr
     }
 

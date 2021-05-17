@@ -2,6 +2,7 @@ const jws = require('jws')
 const fs = require('fs')
 const cbor = require('cbor')
 const base32 = require('base32')
+const base45 = require('base45')
 const qrcode = require('qrcode')
 /*
  * for ES256 create keys like this:
@@ -12,6 +13,21 @@ const qrcode = require('qrcode')
  * ssh-keygen -t ecdsa -b 521 -m PEM -f ./ecdsa521.pem
  * ssh-keygen -e -m PKCS8 -f ./ecdsa521.pem.pub > ecdsa521.pub
  */
+
+
+const base64245 = (str) => {
+  let parts = str.split('.')
+
+  console.log(parts)
+  let newparts = parts.map( part => {
+    let buff = new Buffer(part, 'base64')
+    let b45 = base45.encode(buff)
+    return b45
+  } )
+  console.log(newparts)
+  return newparts.join('.')
+}
+
 const ALGO = 'ES256'
 
 const DATA = { n: 'Felix Cat',
@@ -52,6 +68,8 @@ let signature = jws.sign( {
 } )
 
 console.log(signature.length,signature)
+let sig45 = base64245(signature)
+console.log(base64245(signature))
 
 let pubKey = `-----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8HOwR7KpuzBJn+H2Go2Qk9EmsK20
@@ -61,8 +79,10 @@ console.log( jws.verify( signature, ALGO, pubKey.toString() ) )
 
 console.log("JWS L")
 console.log(qrcode.create(signature, { errorCorrectionLevel: 'L' }))
+console.log(qrcode.create(sig45, { errorCorrectionLevel: 'L' }))
 console.log("JWS Q")
 console.log(qrcode.create(signature, { errorCorrectionLevel: 'Q' }))
+console.log(qrcode.create(sig45, { errorCorrectionLevel: 'Q' }))
 
 let sig_32 = base32.encode(signature).toUpperCase()
 
