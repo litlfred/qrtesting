@@ -281,12 +281,27 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
     let cosebrotli = zlib.brotliCompressSync(cosebuf)
     let cose32 = base32.encode(cosebuf).toUpperCase()
     let cose45 = base45.encode(cosebuf)
-    let cosed32 = base32.encode(cosed)
+    let cosed32 = base32.encode(cosed).toUpperCase()
     let cosed45 = base45.encode(cosed)
-    let cosegz32 = base32.encode(cosegz)
+    let cosegz32 = base32.encode(cosegz).toUpperCase()
     let cosegz45 = base45.encode(cosegz)
     let cosebrotli32 = base32.encode(cosebrotli)
     let cosebrotli45 = base45.encode(cosebrotli)
+
+    let cosecborbuf = await cose.sign.create(headers,cbor.encode(msg),signer)
+    let cosecborstr =  cosebuf.toString('hex')
+    // MUST DO toUpperCase() so QR will use alphanumeric
+    let cosecbord = zlib.deflateSync(cosecborbuf)
+    let cosecborgz = zlib.gzipSync(cosecborbuf)
+    let cosecborbrotli = zlib.brotliCompressSync(cosecborbuf)
+    let cosecbor32 = base32.encode(cosecborbuf).toUpperCase()
+    let cosecbor45 = base45.encode(cosecborbuf)
+    let cosecbord32 = base32.encode(cosecbord).toUpperCase()
+    let cosecbord45 = base45.encode(cosecbord)
+    let cosecborgz32 = base32.encode(cosecborgz).toUpperCase()
+    let cosecborgz45 = base45.encode(cosecborgz)
+    let cosecborbrotli32 = base32.encode(cosecborbrotli)
+    let cosecborbrotli45 = base45.encode(cosecborbrotli)
 
 
     let serializations = {
@@ -296,10 +311,15 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 	//'cbor_b32' : b32str,
 	//'jwt' : jwtstr,
 	'cose' : cosestr,
-	//'cose32' : cose32,
+	'cosecbor' : cosecborstr,
+	'cose32' : cose32,
+	'cosecbor32' : cosecbor32,
 	'cose45' : cose45,
-  //'cosed32' : cosed32,
+	'cosecbor45' : cosecbor45,
+  'cosed32' : cosed32,
+  'cosecbord32' : cosecbord32,
   'cosed45' : cosed45,
+  'cosecbord45' : cosecbord45,
   //'cosegz32' : cosegz32,
   'cosegz45' : cosegz45,
   //'cosebrotli32' : cosebrotli32,
