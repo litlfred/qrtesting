@@ -417,6 +417,8 @@ AwEHoUQDQgAE8HOwR7KpuzBJn+H2Go2Qk9EmsK20+wzylQ64IKhrrszOrmIekG1v
 IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
 -----END EC PRIVATE KEY-----`
     } )
+    let jwsd = zlib.deflateSync(jwsstr)
+    let jwsd45 = base45.encode(jwsd)
 
       /* makes invalid JWS due to payload and haven't found a way to retrieve from the payload yet
     let jwscbr = jws.sign( { 
@@ -493,6 +495,7 @@ IwT8wck/ahwIRdyWBEqCZ7gdy3Gg8MADTQ==
   //'cosebrotli32' : cosebrotli32,
   'cosebrotli45' : cosebrotli45,
   'jws' : jwsstr,
+  'jwsd45' : jwsd45,
   //'jwscbr' : jwscbr
     }
 
